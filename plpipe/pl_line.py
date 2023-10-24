@@ -25,9 +25,12 @@ def main():
         x_interpolated = np.linspace(np.min(fields._fields[0]._x),
                                      np.max(fields._fields[0]._x),
                                      resolution[0])
-        y_interpolated = np.linspace(np.min(fields._fields[0]._y),
-                                     np.max(fields._fields[0]._y), resolution[1])
-        #y_interpolated = np.arange(np.shape(fields._fields[0]._v)[1])
+        try:
+            y_interpolated = np.linspace(np.min(fields._fields[0]._y),
+                                         np.max(fields._fields[0]._y), resolution[1])
+        except AttributeError:
+            y_interpolated = np.arange(np.shape(fields._fields[0]._v)[1])
+
         fields_interpolated = fields.interpolate_all(
             x_interpolated, y_interpolated)
         fields_out = fields_interpolated
