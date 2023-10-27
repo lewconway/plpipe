@@ -10,11 +10,8 @@ def main():
     """
 
     args = parse()
-    print('here')
 
     fields = parse_stdin()
-
-    print('here')
 
     if args.transpose:
         fields = fields.transpose_all()
