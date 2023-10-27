@@ -22,7 +22,7 @@ This python library attempts to make a version of this which
 - Can plot 1D and 2D data
 - Can call custom templates [WIP]
 
-Basic usage:
+## Basic usage:
 ```
 > cat data
 ####Energy  (eV/C)
@@ -36,19 +36,35 @@ Basic usage:
 ```
 
 ```
-cat data | pl-line -x 'Nice xlabel [ABO<sub>3</sub>]' -v 'Another Nice label'
+cat data | pl-line'
+```
+
+<img src='images/USAGE0.png' width='250'>
+
+### Overwrite axis labels
+```
+cat data | pl-line -x 'Nice xlabel [ABO<sub>3</sub>]' -v 'Another Nice label' 
 ```
 
 <img src='images/USAGE1.png' width='250'>
 
+### Interpolate data (along both axes) and plot lines
 ```
 cat data | pl-line -R 100 -m 'lines'
 ```
 
 <img src='images/USAGE2.png' width='250'>
 
+### Interpolate data (along both axes) and plot surface
 ```
 cat data | pl-surf -R 100 --colorbar
 ```
 
 <img src='images/USAGE3.png' width='250'>
+
+### Read two gridded fields, interpolate them and plot the lowest 
+```
+cat data | pl-surf -R 100 --colorbar
+```
+
+<img src='images/USAGE4.png' width='250'>
