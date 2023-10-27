@@ -39,7 +39,7 @@ def main():
     fields_out._fields[-1].print_strips(show_legend=args.legend, mode=args.mode)
 
     if args.dump is not None:
-        fields.write_all(args.dump)
+        fields_out.write_all(args.dump)
 
 
 if __name__ == "__main__":

@@ -62,9 +62,35 @@ cat data | pl-surf -R 100 --colorbar
 
 <img src='images/USAGE3.png' width='250'>
 
-### Read two gridded fields, interpolate them and plot the lowest 
+### Read two gridded fields, interpolate them and plot the lowest  (ie. phase diagram)
 ```
-cat data | pl-surf -R 100 --colorbar
+>cat data
+####Energy  (eV/C)
+###1+c/a
+##Position  (Fractional  Coordinates)
+#DATA1      0.00000000      1.00000000
+     0.00000000     25.00000000     37.50000000
+     1.00000000     20.25000000     20.75625000
+    ...
+    19.00000000     20.25000000     20.75625000
+    20.00000000     25.00000000     37.50000000
+#DATA2      0.00000000      1.00000000
+     0.00000000     1.00000000     1.00000000
+     1.00000000     1.00000000     1.00000000
+     2.00000000     1.00000000     1.00000000
+    ...
+    19.00000000     1.00000000     1.00000000
+    20.00000000     1.00000000     1.00000000
+```
+
+```
+cat data | pl-phase -R 100 --colorbar
 ```
 
 <img src='images/USAGE4.png' width='250'>
+
+```
+cat data | pl-phase -R 100 --colorbar --vector
+```
+
+<img src='images/USAGE5.png' width='250'>
