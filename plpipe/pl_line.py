@@ -3,6 +3,7 @@ from .plpipe_core import parse, parse_stdin
 import numpy as np
 
 
+
 def main():
     """TODO: Docstring for main.
     :returns: TODO
@@ -35,7 +36,7 @@ def main():
             x_interpolated, y_interpolated)
         fields_out = fields_interpolated
 
-    fields_out._fields[-1].print_strips()
+    fields_out._fields[-1].print_strips(show_legend=args.legend, mode=args.mode)
 
     if args.dump is not None:
         fields.write_all(args.dump)

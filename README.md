@@ -12,7 +12,7 @@ And I want to quickly make a plot of the columned data. I could probably use
 cat data | gracebat -hdevice PNG -hardcopy -printfile out.png -pipe -nxy - -fixed 3840 2160
 ```
 
-But I find xmgrace to be a bit clunky when it comes to doing anything fancy. 
+But I find xmgrace to be a bit clunky when it comes to doing anything fancy such as adding labels etc.
 
 This python library attempts to make a version of this which 
 - Reads data from stdin
@@ -22,11 +22,12 @@ This python library attempts to make a version of this which
 - Can plot 1D and 2D data
 - Can call custom templates [WIP]
 
+Basic usage:
 ```
-cat data | pl-line
+cat data | pl-line -x x-data -v value
 ```
 
-![]()
+![USAGE1](images/USAGE1.png)
 
 ```
 cat data | pl-line -R 100 

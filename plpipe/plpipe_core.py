@@ -10,12 +10,19 @@ import re
 from termcolor import colored
 from .spg import spg_dict_html as spg_dict
 
+xlabel = None
+ylabel = None
+vlabel = None
+
 
 def parse():
     """Parse using argparse
     :returns: TODO
 
     """
+
+    global xlabel, ylabel, vlabel
+
     parser = argparse.ArgumentParser()
     parser.add_argument("-R", "--resolution", default=None, type=int,
                         help="Resolution of image via interpolation")
@@ -27,7 +34,25 @@ def parse():
                         default=False, help="transpose data")
     parser.add_argument("--dump", default=None, type=str,
                         help="dump interolated data to a file")
-    return parser.parse_args()
+    parser.add_argument("-x", "--xlabel", default=None, type=str,
+                        help="X label text")
+    parser.add_argument("-y", "--ylabel", default=None, type=str,
+                        help="y label text")
+    parser.add_argument("-v", "--vlabel", default=None, type=str,
+                        help="v label text [for surfaces]")
+    parser.add_argument("--legend", action="store_true", default=False,
+                        help="Show legend")
+    parser.add_argument("--colorbar", action="store_true", default=False,
+                        help="Show colorbar")
+    parser.add_argument("-m", "--mode", default='markers + lines', type=str,
+                        help="scatter plot mode for Plotly (markers, lines, markers + lines...)")
+    args = parser.parse_args()
+
+    xlabel = args.xlabel
+    ylabel = args.ylabel
+    vlabel = args.vlabel
+
+    return args
 
 
 def string_to_chem(string):
@@ -88,10 +113,6 @@ def setup_plotly():
 
 fig = go.Figure()
 
-xlabel = None
-ylabel = None
-vlabel = None
-
 
 def parse_stdin():
     """TODO: Docstring for parse_stdin.
@@ -107,11 +128,11 @@ def parse_stdin():
         tmp_field = Field(x=x)
         for line in f:
             splitline = line.split()
-            if line.startswith('####'):
+            if line.startswith('####') and vlabel is None:
                 vlabel = line.strip('#').strip()
-            elif line.startswith('###'):
+            elif line.startswith('###') and ylabel is None:
                 ylabel = line.strip('#').strip()
-            elif line.startswith('##'):
+            elif line.startswith('##') and xlabel is None:
                 xlabel = line.strip('#').strip()
             elif line.startswith('#'):
                 if len(tmp_field._x) > 0:
@@ -265,7 +286,7 @@ class Field():
         return Field(name=self._name + '[transposed]',
                      x=self._y, y=self._x, v=self._v.T)
 
-    def print_strips(self, filename='out'):
+    def print_strips(self, filename='out', show_legend=False, mode='markers + lines'):
         """Print each column as an individual line
         :returns: TODO
 
@@ -278,7 +299,7 @@ class Field():
                 name = 'list'
 
             fig.add_trace(go.Scatter(x=self._x, y=column,
-                          mode='markers+lines', name=name, showlegend=False))
+                          mode=mode, name=name, showlegend=show_legend))
 
         fig.update_layout(
             xaxis_title=xlabel, yaxis_title=vlabel,
@@ -286,13 +307,15 @@ class Field():
 
         write_plotly_image(fig, filename)
 
-    def print_field_img(self, labels=[], vector=False, filename='out'):
+    def print_field_img(self, labels=[], vector=False,
+                        filename='out', show_legend=False, show_colorbar=False):
         """Prints array using plotly
 
         :data: TODO
         :returns: TODO
 
         """
+
         labels_new = []
         for label in labels:
             label = label.split('[')[0]
@@ -312,14 +335,18 @@ class Field():
 
         fig.update_layout({
             'colorway': ['#00b945', 'LemonChiffon'],
-            'legend': dict(x=0.025, y=1-0.025, xanchor='left', yanchor='top', bgcolor='White', borderwidth=1, bordercolor='Black')
         })
+
+        if show_legend:
+            fig.update_layout({
+                'legend': dict(x=0.025, y=1-0.025, xanchor='left', yanchor='top', bgcolor='White', borderwidth=1, bordercolor='Black')
+            })
 
         colormap = 'sunset_r'
 
         for i, label in enumerate(labels):
             fig.add_trace(go.Scatter(x=[None], y=[None], mode='markers',
-                                     showlegend=True, name=label,
+                                     showlegend=show_legend, name=label,
                                      marker={'color': [i],
                                              'symbol': 'square',
                                              'colorscale': colormap,
@@ -335,7 +362,12 @@ class Field():
                                      line_width=2))
         else:
             fig.add_trace(go.Heatmap(x=self._x, y=self._y, z=data,
-                          showscale=False, colorscale=colormap))
+                          showscale=show_colorbar, colorscale=colormap,
+                                     colorbar=dict(
+                                         title=vlabel,
+                                         titleside="right",
+                                         ticks="inside"
+                                     )))
 
         write_plotly_image(fig, filename)
 

@@ -2,6 +2,7 @@
 from .plpipe_core import parse, parse_stdin
 import numpy as np
 
+
 def main():
     """TODO: Docstring for main.
     :returns: TODO
@@ -38,7 +39,7 @@ def main():
     if args.text:
         min_field.print_int_field_cli(fields_out.get_names())
     else:
-        min_field.print_field_img(fields_out.get_names(), args.vector)
+        min_field.print_field_img(fields_out.get_names(), args.vector, show_legend=True)
 
     if args.dump is not None:
         fields.write_all(args.dump)
