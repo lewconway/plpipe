@@ -27,7 +27,7 @@ Basic usage:
 cat data | pl-line -x x-data -v value
 ```
 
-![USAGE1](images/USAGE1.png)
+<img src='images/USAGE1.png' width='250'>
 
 ```
 cat data | pl-line -R 100 
