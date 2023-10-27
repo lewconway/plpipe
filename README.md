@@ -24,13 +24,31 @@ This python library attempts to make a version of this which
 
 Basic usage:
 ```
-cat data | pl-line -x x-data -v value
+> cat data
+####Energy  (eV/C)
+###1+c/a 
+##Position  (Fractional  Coordinates)
+#DATA1           0            1
+0           25.0         37.5
+1           20.25        20.75625
+2           16.0         9.600000000000001
+...
+```
+
+```
+cat data | pl-line -x 'Nice xlabel [ABO<sub>3</sub>]' -v 'Another Nice label'
 ```
 
 <img src='images/USAGE1.png' width='250'>
 
 ```
-cat data | pl-line -R 100 
+cat data | pl-line -R 100 -m 'lines'
 ```
 
-![]()
+<img src='images/USAGE2.png' width='250'>
+
+```
+cat data | pl-surf -R 100 --colorbar
+```
+
+<img src='images/USAGE3.png' width='250'>
