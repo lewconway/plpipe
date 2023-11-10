@@ -103,7 +103,7 @@ cat examples/data | pl-surf -R 100 --colorbar
 <img src='images/USAGE6.png' width='250'>
 
 ```
-> cat examples/data3 | pl-phase -R 1028 --vector --legend
+> cat examples/data3 | pl-phase -R 1028 --vector 
 ```
 
 <img src='images/USAGE7.png' width='250'>
