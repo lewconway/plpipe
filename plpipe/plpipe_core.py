@@ -357,8 +357,8 @@ class Field():
             data_blur = gaussian_filter(data, 2, output=float, mode="nearest")
             fig.add_trace(go.Contour(x=self._x, y=self._y, z=data_blur, showscale=False,
                                      line_smoothing=0, colorscale=colormap,
-                                     contours=dict(showlabels=False, start=0.5,
-                                                   end=0.5, size=1, coloring='fill'),
+                                     contours=dict(showlabels=False, start=np.min(data_blur)+0.5,
+                                                   end=np.max(data_blur), size=1, coloring='fill'),
                                      line_width=2))
         else:
             fig.add_trace(go.Heatmap(x=self._x, y=self._y, z=data,
