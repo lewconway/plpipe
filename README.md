@@ -84,20 +84,20 @@ cat examples/data | pl-surf -R 100 --colorbar
 ```
 
 ```
-> cat data2 | pl-phase -R 100 --colorbar
+> cat examples/data2 | pl-phase -R 100 --colorbar
 ```
 
 <img src='images/USAGE4.png' width='250'>
 
 ```
-> cat data2 | pl-phase -R 100 --colorbar --vector
+> cat examples/data2 | pl-phase -R 100 --colorbar --vector
 ```
 
 <img src='images/USAGE5.png' width='250'>
 
 
 ```
-> cat examples/example_02b | pl-phase -R 50 --text
+> cat examples/data2 | pl-phase -R 50 --text
 ```
 
 <img src='images/USAGE6.png' width='250'>
