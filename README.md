@@ -84,13 +84,13 @@ cat examples/data | pl-surf -R 100 --colorbar
 ```
 
 ```
-> cat examples/data2 | pl-phase -R 100 --colorbar
+> cat examples/data2 | pl-phase -R 100 --legend
 ```
 
 <img src='images/USAGE4.png' width='250'>
 
 ```
-> cat examples/data2 | pl-phase -R 100 --colorbar --vector
+> cat examples/data2 | pl-phase -R 100 --vector --legend
 ```
 
 <img src='images/USAGE5.png' width='250'>
