@@ -24,7 +24,7 @@ This python library attempts to make a version of this which
 
 ## Basic usage:
 ```
-> cat data
+> cat examples/data
 ####Energy  (eV/C)
 ###1+c/a 
 ##Position  (Fractional  Coordinates)
@@ -36,35 +36,35 @@ This python library attempts to make a version of this which
 ```
 
 ```
-cat data | pl-line'
+cat examples/data | pl-line'
 ```
 
 <img src='images/USAGE0.png' width='250'>
 
 ### Overwrite axis labels
 ```
-cat data | pl-line -x 'Nice xlabel [ABO<sub>3</sub>]' -v 'Another Nice label' 
+cat examples/data | pl-line -x 'Nice xlabel [ABO<sub>3</sub>]' -v 'Another Nice label' 
 ```
 
 <img src='images/USAGE1.png' width='250'>
 
 ### Interpolate data (along both axes) and plot lines
 ```
-cat data | pl-line -R 100 -m 'lines'
+cat examples/data | pl-line -R 100 -m 'lines'
 ```
 
 <img src='images/USAGE2.png' width='250'>
 
 ### Interpolate data (along both axes) and plot surface
 ```
-cat data | pl-surf -R 100 --colorbar
+cat examples/data | pl-surf -R 100 --colorbar
 ```
 
 <img src='images/USAGE3.png' width='250'>
 
 ### Read two gridded fields, interpolate them and plot the lowest  (ie. phase diagram)
 ```
->cat data
+> cat examples/data2
 ####Energy  (eV/C)
 ###1+c/a
 ##Position  (Fractional  Coordinates)
@@ -84,13 +84,20 @@ cat data | pl-surf -R 100 --colorbar
 ```
 
 ```
-cat data | pl-phase -R 100 --colorbar
+> cat data2 | pl-phase -R 100 --colorbar
 ```
 
 <img src='images/USAGE4.png' width='250'>
 
 ```
-cat data | pl-phase -R 100 --colorbar --vector
+> cat data2 | pl-phase -R 100 --colorbar --vector
 ```
 
 <img src='images/USAGE5.png' width='250'>
+
+
+```
+> cat examples/example_02b | pl-phase -R 50 --text
+```
+
+<img src='images/USAGE6.png' width='250'>
