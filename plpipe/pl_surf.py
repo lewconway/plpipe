@@ -32,10 +32,13 @@ def main():
         fields_out = fields_interpolated
 
     for i, field in enumerate(fields_out._fields):
-        field.print_field_img(fields_out.get_names(), args.vector,
-                              show_legend=args.legend,
-                              show_colorbar=args.colorbar,
-                              filename='out' + str(i))
+        if args.text:
+            field.print_int_field_cli()
+        else:
+            field.print_field_img(fields_out.get_names(), args.vector,
+                                  show_legend=args.legend,
+                                  show_colorbar=args.colorbar,
+                                  filename='out' + str(i))
 
     if args.dump is not None:
         fields.write_all(args.dump)

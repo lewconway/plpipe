@@ -36,7 +36,7 @@ def main():
             x_interpolated, y_interpolated)
         fields_out = fields_interpolated
 
-    fields_out._fields[-1].print_strips(show_legend=args.legend, mode=args.mode)
+    fields_out._fields[-1].print_strips(show_legend=args.legend, mode=args.mode, xlim=args.xlim, ylim=args.ylim)
 
     if args.dump is not None:
         fields_out.write_all(args.dump)

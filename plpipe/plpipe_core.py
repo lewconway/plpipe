@@ -38,6 +38,10 @@ def parse():
                         help="X label text")
     parser.add_argument("-y", "--ylabel", default=None, type=str,
                         help="y label text")
+    parser.add_argument("--xlim", default=None, type=float, nargs=2,
+                        help="xaxis limits")
+    parser.add_argument("--ylim", default=None, type=float, nargs=2,
+                        help="yaxis limits")
     parser.add_argument("-v", "--vlabel", default=None, type=str,
                         help="v label text [for surfaces]")
     parser.add_argument("--legend", action="store_true", default=False,
@@ -155,6 +159,14 @@ def parse_stdin():
     return fields
 
 
+def overwrite_axes(fig, xlim, ylim):
+
+    fig.update_layout({
+        'xaxis': {'range': xlim},
+        'yaxis': {'range': ylim}, })
+    return fig
+
+
 def write_plotly_image(fig, string='out'):
     """write plotly image to file
 
@@ -163,6 +175,7 @@ def write_plotly_image(fig, string='out'):
     :returns: TODO
 
     """
+
     fig.write_image(string + '.png', scale=4)
     fig.write_image(string + '.svg', scale=4)
     fig.write_image(string + '.pdf', scale=4)
@@ -286,7 +299,8 @@ class Field():
         return Field(name=self._name + '[transposed]',
                      x=self._y, y=self._x, v=self._v.T)
 
-    def print_strips(self, filename='out', show_legend=False, mode='markers + lines'):
+    def print_strips(self, filename='out', show_legend=False, mode='markers + lines',
+                     xlim=None, ylim=None):
         """Print each column as an individual line
         :returns: TODO
 
@@ -305,6 +319,7 @@ class Field():
             xaxis_title=xlabel, yaxis_title=vlabel,
             xaxis={'range': [np.min(self._x), np.max(self._x)]})
 
+        fig = overwrite_axes(fig, xlim, ylim)
         write_plotly_image(fig, filename)
 
     def print_field_img(self, labels=[], vector=False,
