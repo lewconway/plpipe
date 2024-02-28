@@ -1,4 +1,4 @@
-#! /usr/bin/env python3.9
+#! /usr/bin/env python
 from .plpipe_core import parse, parse_stdin
 import numpy as np
 

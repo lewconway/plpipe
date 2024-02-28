@@ -24,7 +24,7 @@ class TestFieldMethods(unittest.TestCase):
         self.assertTrue(np.all(self.field._v == transposed_field._v.T))
 
     def test_write_data(self):
-        expected_output = """#Test Field      4.00000000      5.00000000 
+        expected_output = """#Test Field 4 5 
      1.00000000     10.00000000     40.00000000 
      2.00000000     20.00000000     50.00000000 
      3.00000000     30.00000000     60.00000000 

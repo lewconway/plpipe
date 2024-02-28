@@ -1,4 +1,4 @@
-#! /usr/bin/env python3.9
+#! /usr/bin/env python
 from setuptools import setup
 
 setup(
@@ -10,6 +10,7 @@ setup(
             "pl-phase = plpipe.pl_phase:main",
             "pl-line = plpipe.pl_line:main",
             "pl-surf = plpipe.pl_surf:main",
+            "pl-fit = plpipe.pl_linearfit:main",
         ],
     },
 )

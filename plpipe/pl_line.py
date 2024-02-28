@@ -1,7 +1,6 @@
-#! /usr/bin/env python3.9
+#! /usr/bin/env python
 from .plpipe_core import parse, parse_stdin
 import numpy as np
-
 
 
 def main():
@@ -36,7 +35,18 @@ def main():
             x_interpolated, y_interpolated)
         fields_out = fields_interpolated
 
-    fields_out._fields[-1].print_strips(show_legend=args.legend, mode=args.mode, xlim=args.xlim, ylim=args.ylim)
+    template_list = ['basic']
+    [template_list.append(_) for _ in args.template]
+    template_string = '+'.join(template_list)
+    fig = None
+    i = 0
+    for f in fields_out._fields:
+        fig = f.print_strips(show_legend=args.legend, mode=args.mode, filename='out' + str(i),
+                             xlim=args.xlim, ylim=args.ylim, fig=fig,
+                             template=template_string)
+        if not args.append:
+            fig = None
+            i += 1
 
     if args.dump is not None:
         fields_out.write_all(args.dump)

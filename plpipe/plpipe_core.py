@@ -1,4 +1,4 @@
-#! /usr/bin/env python3.9
+#! /usr/bin/env python
 import sys
 import numpy as np
 import argparse
@@ -9,6 +9,8 @@ import plotly.graph_objects as go
 import re
 from termcolor import colored
 from .spg import spg_dict_html as spg_dict
+from . import plpipe_templates
+from itertools import cycle
 
 xlabel = None
 ylabel = None
@@ -48,8 +50,12 @@ def parse():
                         help="Show legend")
     parser.add_argument("--colorbar", action="store_true", default=False,
                         help="Show colorbar")
-    parser.add_argument("-m", "--mode", default='markers + lines', type=str,
+    parser.add_argument("-m", "--mode", default=None, type=str, nargs='*',
                         help="scatter plot mode for Plotly (markers, lines, markers + lines...)")
+    parser.add_argument("--template", default=['basic'], type=str, nargs='*',
+                        help="template[s] for plotting theme")
+    parser.add_argument("--append", const=True, default=False, action='store_const',
+                        help="make one figure with all data")
     args = parser.parse_args()
 
     xlabel = args.xlabel
@@ -64,55 +70,29 @@ def string_to_chem(string):
     return string
 
 
-def setup_plotly():
+def setup_plotly(template='basic', fig=None):
     """TODO: sets up plotly with sensible layout
     :returns: TODO
 
     """
-    fig = go.Figure()
-    fig.update_layout({
-        'colorway': ['#0C5DA5', '#00B945', '#FF9500',
-                     '#FF2C00', '#845B97', '#474747', '#9e9e9e'],
-        'font_family': 'Helvetica',
-        'font_color': 'black',
-        'font_size': 13,
-        'legend': dict(x=0.025, y=0.025, xanchor='left', yanchor='bottom',
-                       bgcolor='White', borderwidth=1, bordercolor='Black'),
-        'paper_bgcolor': 'white',
-        'plot_bgcolor': 'white',
-        'width': 350,
-        'height':  265,
-        'autosize': True,
-        'margin': dict(l=0, r=10, b=0, t=8, pad=0),
-        'xaxis': {'automargin': True,
-                  'mirror': 'allticks',
-                  'nticks': 10,
-                  'gridcolor': 'rgb(232,232,232)',
-                  'linecolor': 'rgb(36,36,36)',
-                  'showgrid': False,
-                  'showline': True,
-                  'ticks': 'inside',
-                  'minor_ticks': 'inside',
-                  'title': {'standoff': 15},
-                  'zeroline': False,
-                  'layer': 'above traces',
-                  'zerolinecolor': 'rgb(36,36,36)'},
-        'yaxis': {'automargin': True,
-                  # 'range': (-2.5, 1),
-                  'tickformat': None,
-                  'mirror': 'allticks',
-                  'gridcolor': 'rgb(232,232,232)',
-                  'linecolor': 'rgb(36,36,36)',
-                  'showgrid': False,
-                  'showline': True,
-                  'ticks': 'inside',
-                  'minor_ticks': 'inside',
-                  'title': {'standoff': 15},
-                  'zeroline': False,
-                  'layer': 'above traces',
-                  'zerolinecolor': 'rgb(36,36,36)'}
-    })
-    return fig
+    if fig is None:
+        fig = go.Figure()
+
+    extras = {}
+    for t in template.split('+'):
+        try:
+            extras.update(plpipe_templates.template_extras[t])
+        except KeyError:
+            pass
+#
+#    try:
+#        extras = template.pop('extra')
+#    except KeyError:
+#        extras = None
+
+    fig.update_layout(template=template)
+
+    return fig, extras
 
 
 fig = go.Figure()
@@ -145,11 +125,13 @@ def parse_stdin():
                     tmp_field = Field()
                 x = []
                 v = []
+
                 try:
                     y = np.array([float(i) for i in splitline[1:]])
                 except ValueError:
                     y = splitline[1:]
-                tmp_field.set_data(name=splitline[0][1:], y=np.array(y))
+
+                tmp_field.set_data(name=splitline[0][1:], y=y)
             else:
                 x.append(float(splitline[0]))
                 v.append([float(i) for i in splitline[1:]])
@@ -201,6 +183,7 @@ class Field():
         :y: The y value.
         :z: The z value.
         """
+
         if name is not None:
             self._name = name
         if x is not None:
@@ -210,6 +193,9 @@ class Field():
         if v is not None:
             self._v = v
 
+        if not hasattr(self, '_y') and hasattr(self, '_v'):
+            self._y = ['data'] * np.shape(self._v)[1]
+
     def write_data(self, file=None):
         """for Debugging, write out data
         :returns: TODO
@@ -217,7 +203,7 @@ class Field():
         """
         print(f'#{self._name}', end=' ', file=file)
         for i in self._y:
-            print(f'{i:15.8f}', end=' ', file=file)
+            print(f'{i}', end=' ', file=file)
         print(file=file)
         for i, j in zip(self._x, self._v):
             print(f'{i:15.8f}', end=' ', file=file)
@@ -299,21 +285,38 @@ class Field():
         return Field(name=self._name + '[transposed]',
                      x=self._y, y=self._x, v=self._v.T)
 
-    def print_strips(self, filename='out', show_legend=False, mode='markers + lines',
-                     xlim=None, ylim=None):
+    def print_strips(self, filename='out', show_legend=False, mode=None,
+                     xlim=None, ylim=None, template='basic', fig=None):
         """Print each column as an individual line
         :returns: TODO
 
         """
-        fig = setup_plotly()
+
+        fig, extras = setup_plotly(template, fig)
+
+        dash = 'solid'
+        if extras is not None and mode is None:
+            try:
+                mode = extras['mode_list']
+                dash = extras['dash_list']
+            except KeyError:
+                pass
+
+        mode_cycler = cycle(mode)
+        dash_cycler = cycle(dash)
+
         for i, column in enumerate(self._v.T):
             try:
                 name = str(self._y[i])
+                name = convert_labels_for_AIRSS([name])[0]
             except AttributeError:
                 name = 'list'
 
+            dash = next(dash_cycler)
+            mode = next(mode_cycler)
             fig.add_trace(go.Scatter(x=self._x, y=column,
-                          mode=mode, name=name, showlegend=show_legend))
+                                     mode=mode, name=name, line={'dash': dash},
+                          showlegend=(show_legend and '-fit' not in name)))
 
         fig.update_layout(
             xaxis_title=xlabel, yaxis_title=vlabel,
@@ -321,6 +324,8 @@ class Field():
 
         fig = overwrite_axes(fig, xlim, ylim)
         write_plotly_image(fig, filename)
+
+        return fig
 
     def print_field_img(self, labels=[], vector=False,
                         filename='out', show_legend=False, show_colorbar=False):
@@ -331,19 +336,11 @@ class Field():
 
         """
 
-        labels_new = []
-        for label in labels:
-            label = label.split('[')[0]
-            labeltmp = string_to_chem(label.split('-')[0].split('*')[-1]) + r' '
-            if '-' in label:
-                label = labeltmp + \
-                    r'[<i>' + spg_dict['-'.join(label.split('-')[1:])] + r'</i>] '
-            labels_new.append(label)
+        labels = convert_labels_for_AIRSS(labels)
 
-        labels = labels_new
         data = self._v.T
 
-        fig = setup_plotly()
+        fig, extras = setup_plotly()
 
         fig.update_layout(
             xaxis_title=xlabel, yaxis_title=ylabel)
@@ -359,8 +356,10 @@ class Field():
 
         colormap = 'sunset_r'
 
+        mode_cycler = cycle(['markers', 'markers + lines'])
         for i, label in enumerate(labels):
-            fig.add_trace(go.Scatter(x=[None], y=[None], mode='markers',
+            mode = next(mode_cycler)
+            fig.add_trace(go.Scatter(x=[None], y=[None], mode=mode,
                                      showlegend=show_legend, name=label,
                                      marker={'color': [i],
                                              'symbol': 'square',
@@ -492,7 +491,7 @@ class Fields(object):
             tmpfields.add_field(tmpfield)
         return tmpfields
 
-    def write_all(self, file_name='out.dat'):
+    def write_all(self, file_name=sys.stdout):
         """for Debugging
 
         :f: TODO
@@ -502,7 +501,15 @@ class Fields(object):
 
         global xlabel, ylabel, vlabel
 
-        with open(file_name, 'w') as file:
+        if type(file_name) is str:
+            with open(file_name, 'w') as file:
+                print(f'####{vlabel}', file=file)
+                print(f'###{ylabel}', file=file)
+                print(f'##{xlabel}', file=file)
+                for i in self._fields:
+                    i.write_data(file)
+        else:
+            file = file_name
             print(f'####{vlabel}', file=file)
             print(f'###{ylabel}', file=file)
             print(f'##{xlabel}', file=file)
@@ -544,3 +551,28 @@ class Fields(object):
         ylabel = tmp
 
         return fields_transposed
+
+
+def convert_labels_for_AIRSS(labels):
+    """TODO: Docstring for convert_labels_for_AIRSS.
+
+    :labels: a list of strings of the form <N>-<FORMULA>-<SPACEGROUP>
+    as used in airss by the 'name' function. eg. 1-C-Fd-3c
+    :returns: A Formatted HTML string that looks like <Formula> [<Spacegroup>] with the correct subscripts and overbars.
+
+    """
+    labels_new = []
+    for label in labels:
+        try:
+            label = label.split('[')[0]
+            labeltmp = string_to_chem(label.split('-')[1].split('*')[-1]) + r' '
+            if '-' in label:
+                label = labeltmp + \
+                    r'[<i>' + spg_dict['-'.join(label.split('-')[2:])] + r'</i>] '
+        except KeyError:
+            label = label
+        except IndexError:
+            label = label
+        labels_new.append(label)
+
+    return labels_new
