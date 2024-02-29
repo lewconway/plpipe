@@ -285,7 +285,7 @@ class Field():
         return Field(name=self._name + '[transposed]',
                      x=self._y, y=self._x, v=self._v.T)
 
-    def print_strips(self, filename='out', show_legend=False, mode=None,
+    def print_strips(self, filename='out', show_legend=False, mode='lines',
                      xlim=None, ylim=None, template='basic', fig=None):
         """Print each column as an individual line
         :returns: TODO
@@ -294,7 +294,7 @@ class Field():
 
         fig, extras = setup_plotly(template, fig)
 
-        dash = 'solid'
+        dash = ['solid']
         if extras is not None and mode is None:
             try:
                 mode = extras['mode_list']
@@ -302,8 +302,10 @@ class Field():
             except KeyError:
                 pass
 
-        mode_cycler = cycle(mode)
-        dash_cycler = cycle(dash)
+        if mode is not None:
+            mode_cycler = cycle(mode)
+        if dash is not None:
+            dash_cycler = cycle(dash)
 
         for i, column in enumerate(self._v.T):
             try:
