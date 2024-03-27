@@ -285,7 +285,7 @@ class Field():
         return Field(name=self._name + '[transposed]',
                      x=self._y, y=self._x, v=self._v.T)
 
-    def print_strips(self, filename='out', show_legend=False, mode='lines',
+    def print_strips(self, filename='out', show_legend=False, mode=['lines'],
                      xlim=None, ylim=None, template='basic', fig=None):
         """Print each column as an individual line
         :returns: TODO
@@ -297,10 +297,13 @@ class Field():
         dash = ['solid']
         if extras is not None and mode is None:
             try:
-                mode = extras['mode_list']
+                mode = [extras['mode_list']]
+            except KeyError:
+                mode = [[mode]]
+            try:
                 dash = extras['dash_list']
             except KeyError:
-                pass
+                dash = ['solid']
 
         if mode is not None:
             mode_cycler = cycle(mode)
@@ -314,10 +317,10 @@ class Field():
             except AttributeError:
                 name = 'list'
 
-            dash = next(dash_cycler)
-            mode = next(mode_cycler)
+            dash_c = next(dash_cycler)
+            mode_c = next(mode_cycler)
             fig.add_trace(go.Scatter(x=self._x, y=column,
-                                     mode=mode, name=name, line={'dash': dash},
+                                     mode=mode_c, name=name, line={'dash': dash_c},
                           showlegend=(show_legend and '-fit' not in name)))
 
         fig.update_layout(
