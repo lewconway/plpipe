@@ -162,3 +162,6 @@ cython_debug/
 *.swp
 tests/output/*
 examples/*.png
+examples/*.html
+examples/*.svg
+examples/*.pdf

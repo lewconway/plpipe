@@ -71,6 +71,12 @@ pio.templates['keynote-solid-dash'] = {'layout': {'colorway': ['#000000', '#0000
                                                                '#9684a1', '#9684a1',
                                                                '#e1d89f', '#e1d89f']}}
 
+pio.templates['smallfont'] = {'layout':
+                              {'legend': {'font': {'size': 6}},
+                               'font_size': 6,
+                               'legend_tracegroupgap': 0,
+                               }}
+
 template_extras = {}
 
 template_extras['basic'] = {'mode_list': ['lines'],

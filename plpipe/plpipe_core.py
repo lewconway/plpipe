@@ -299,7 +299,7 @@ class Field():
             try:
                 mode = [extras['mode_list']]
             except KeyError:
-                mode = [[mode]]
+                mode = [mode]
             try:
                 dash = extras['dash_list']
             except KeyError:
