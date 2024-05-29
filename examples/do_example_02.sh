@@ -1,12 +1,12 @@
 cat data | pl-line
 
-mv out.png example_02.png
-rm out.*
+mv out0.png example_02.png
+rm out0.*
 
 cat data | pl-line -R 16
 
-mv out.png example_02_interpolated.png
-rm out.*
+mv out0.png example_02_interpolated.png
+rm out0.*
 
 cat data | pl-surf -R 128
 
