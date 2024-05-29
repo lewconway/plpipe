@@ -297,7 +297,7 @@ class Field():
         dash = ['solid']
         if extras is not None and mode is None:
             try:
-                mode = [extras['mode_list']]
+                mode = extras['mode_list']
             except KeyError:
                 mode = [mode]
             try:
