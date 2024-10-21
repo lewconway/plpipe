@@ -56,6 +56,13 @@ def parse():
                         help="template[s] for plotting theme")
     parser.add_argument("--append", const=True, default=False, action='store_const',
                         help="make one figure with all data")
+    parser.add_argument("--log", const=True, default=False, action='store_const',
+                        help="log-log plot")
+    parser.add_argument("--loglin", const=True, default=False, action='store_const',
+                        help="log-lin plot")
+    parser.add_argument("--linlog", const=True, default=False, action='store_const',
+                        help="lin-lin plot")
+
     args = parser.parse_args()
 
     xlabel = args.xlabel
@@ -141,11 +148,24 @@ def parse_stdin():
     return fields
 
 
-def overwrite_axes(fig, xlim, ylim):
+def overwrite_axes(fig, xlim, ylim, xlog='linear', ylog='linear'):
+
+    #    ylim = np.where(np.isnan(ylim), None, ylim)
+    #    xlim = np.where(np.isnan(xlim), None, xlim)
+    #    print(ylim)
+
+    if xlog == 'log' and xlim is not None:
+        xlim = np.log10(xlim)
+        fig.update_xaxes({'dtick': 1})
+    if ylog == 'log' and xlim is not None:
+        fig.update_yaxes({'dtick': 1})
+        ylim = np.log10(ylim)
 
     fig.update_layout({
         'xaxis': {'range': xlim},
         'yaxis': {'range': ylim}, })
+    fig.update_xaxes(type=xlog)
+    fig.update_yaxes(type=ylog)
     return fig
 
 
@@ -158,7 +178,7 @@ def write_plotly_image(fig, string='out'):
 
     """
 
-    fig.write_image(string + '.png', scale=4)
+    fig.write_image(string + '.png', scale=8)
     fig.write_image(string + '.svg', scale=4)
     fig.write_image(string + '.pdf', scale=4)
     fig.write_html(string + '.html')
@@ -227,7 +247,7 @@ class Field():
 
         # Create the Gaussian Process Regressor
         gp = GaussianProcessRegressor(
-            kernel=kernel, alpha=0.1, n_restarts_optimizer=0, normalize_y=True)
+            kernel=kernel, alpha=0.1, n_restarts_optimizer=100, normalize_y=True)
 
         X = []
 
@@ -255,7 +275,7 @@ class Field():
         scaler = preprocessing.StandardScaler().fit(X)
         X = scaler.transform(X)
 
-        # Fit the Gaussian Process Regressor to the data
+        # Fit xthe Gaussian Process Regressor to the data
         gp.fit(X, V)
 
         X_pred = []
@@ -286,7 +306,8 @@ class Field():
                      x=self._y, y=self._x, v=self._v.T)
 
     def print_strips(self, filename='out', show_legend=False, mode=['lines'],
-                     xlim=None, ylim=None, template='basic', fig=None):
+                     xlim=None, ylim=None, xlog='linear', ylog='linear',
+                     template='basic', fig=None):
         """Print each column as an individual line
         :returns: TODO
 
@@ -295,6 +316,7 @@ class Field():
         fig, extras = setup_plotly(template, fig)
 
         dash = ['solid']
+        fill = 'none'
         if extras is not None and mode is None:
             try:
                 mode = extras['mode_list']
@@ -304,6 +326,10 @@ class Field():
                 dash = extras['dash_list']
             except KeyError:
                 dash = ['solid']
+            try:
+                fill = extras['fill']
+            except KeyError:
+                fill = 'none'
 
         if mode is not None:
             mode_cycler = cycle(mode)
@@ -320,14 +346,16 @@ class Field():
             dash_c = next(dash_cycler)
             mode_c = next(mode_cycler)
             fig.add_trace(go.Scatter(x=self._x, y=column,
-                                     mode=mode_c, name=name, line={'dash': dash_c},
-                          showlegend=(show_legend and '-fit' not in name)))
+                                     mode=mode_c, name=name,
+                                     line={'dash': dash_c},
+                                     fill=fill,
+                                     showlegend=(show_legend and '-fit' not in name)))
 
         fig.update_layout(
             xaxis_title=xlabel, yaxis_title=vlabel,
             xaxis={'range': [np.min(self._x), np.max(self._x)]})
 
-        fig = overwrite_axes(fig, xlim, ylim)
+        fig = overwrite_axes(fig, xlim, ylim, xlog, ylog)
         write_plotly_image(fig, filename)
 
         return fig
@@ -573,7 +601,7 @@ def convert_labels_for_AIRSS(labels):
             labeltmp = string_to_chem(label.split('-')[1].split('*')[-1]) + r' '
             if '-' in label:
                 label = labeltmp + \
-                    r'[<i>' + spg_dict['-'.join(label.split('-')[2:])] + r'</i>] '
+                    r'[<i>' + spg_dict['-'.join(label.split('-')[2:]).replace('/','')] + r'</i>] '
         except KeyError:
             label = label
         except IndexError:

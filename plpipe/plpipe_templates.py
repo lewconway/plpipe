@@ -53,6 +53,19 @@ pio.templates['solid-dash'] = {'layout': {'colorway': ['#0C5DA5', '#0C5DA5',
                                                        '#845B97', '#845B97',
                                                        '#474747', '#474747',
                                                        '#9e9e9e', '#9e9e9e']}}
+pio.templates["empty"] = {'layout': {
+    'xaxis': {'automargin': True,
+              'showline': False,
+              'minor_ticks': '',
+              'ticks': '',
+              'showticklabels': False},
+    'yaxis': {'automargin': True,
+              'showline': False,
+              'minor_ticks': '',
+              'ticks': '',
+              'showticklabels': False},
+}}
+
 
 pio.templates['outside-legend'] = {'layout': {'legend': dict(
     x=0.0, y=1.1, xanchor='left', yanchor='bottom',
@@ -60,6 +73,18 @@ pio.templates['outside-legend'] = {'layout': {'legend': dict(
 
 pio.templates['side-outside-legend'] = {'layout': {'legend': dict(
     x=1.1, y=0, xanchor='left', yanchor='bottom',
+    bgcolor='White', borderwidth=1, bordercolor='Black', )}}
+
+pio.templates['top-right-legend'] = {'layout': {'legend': dict(
+    x=0.95, y=0.95, xanchor='right', yanchor='top',
+    bgcolor='White', borderwidth=1, bordercolor='Black', )}}
+
+pio.templates['top-left-legend'] = {'layout': {'legend': dict(
+    x=0.05, y=0.95, xanchor='left', yanchor='top',
+    bgcolor='White', borderwidth=1, bordercolor='Black', )}}
+
+pio.templates['bottom-right-legend'] = {'layout': {'legend': dict(
+    x=0.95, y=0.05, xanchor='right', yanchor='bottom',
     bgcolor='White', borderwidth=1, bordercolor='Black', )}}
 
 pio.templates['keynote'] = {'layout': {'colorway': [
@@ -70,6 +95,7 @@ pio.templates['keynote-solid-dash'] = {'layout': {'colorway': ['#000000', '#0000
                                                                '#941751', '#941751',
                                                                '#9684a1', '#9684a1',
                                                                '#e1d89f', '#e1d89f']}}
+pio.templates['underfill'] = {}
 
 pio.templates['smallfont'] = {'layout':
                               {'legend': {'font': {'size': 6}},
@@ -93,3 +119,5 @@ template_extras['keynote'] = {'mode_list': ['lines'], 'dash_list': ['solid']}
 pio.templates['alternating'] = pio.templates['solid-dash']
 
 template_extras['alternating'] = {'marker_list': ['square', 'circle']}
+
+template_extras['underfill'] = {'fill': 'tozeroy'}

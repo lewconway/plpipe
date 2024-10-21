@@ -11,6 +11,12 @@ def main():
 
     args = parse()
 
+    xlog = ylog = 'linear'
+    if args.log or args.loglin:
+        xlog = 'log'
+    if args.log or args.linlog:
+        ylog = 'log'
+
     fields = parse_stdin()
 
     if args.transpose:
@@ -30,7 +36,6 @@ def main():
                                          np.max(fields._fields[0]._y), resolution[1])
         else:
             y_interpolated = np.arange(np.shape(fields._fields[0]._v)[1])
-
         fields_interpolated = fields.interpolate_all(
             x_interpolated, y_interpolated)
         fields_out = fields_interpolated
@@ -42,7 +47,7 @@ def main():
     i = 0
     for f in fields_out._fields:
         fig = f.print_strips(show_legend=args.legend, mode=args.mode, filename='out' + str(i),
-                             xlim=args.xlim, ylim=args.ylim, fig=fig,
+                             xlim=args.xlim, ylim=args.ylim, xlog=xlog, ylog=ylog, fig=fig,
                              template=template_string)
         if not args.append:
             fig = None
