@@ -157,7 +157,7 @@ def overwrite_axes(fig, xlim, ylim, xlog='linear', ylog='linear'):
     if xlog == 'log' and xlim is not None:
         xlim = np.log10(xlim)
         fig.update_xaxes({'dtick': 1})
-    if ylog == 'log' and xlim is not None:
+    if ylog == 'log' and ylim is not None:
         fig.update_yaxes({'dtick': 1})
         ylim = np.log10(ylim)
 
